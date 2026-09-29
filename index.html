@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Face Recognition Demo</title>
+
+    <style>
+        #camera {
+            position: relative;
+            width: 720px;
+            height: 560px;
+        }
+
+        #video,
+        #drawing {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 720px;
+            height: 560px;
+        }
+
+        #face-output {
+            position: absolute;
+            left: 16px;
+            bottom: 16px;
+            padding: 8px 12px;
+            color: #fff;
+            background: rgba(0, 0, 0, 0.7);
+            font: 600 18px sans-serif; 
+        }
+
+        #emotions-feed {
+            width: 300px;
+            font-family: monospace; 
+        }
+
+        .emotion-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .emotion-label {
+            width: 90px;
+            text-transform: capitalize;
+        }
+
+        .emotion-bar-bg {
+            flex: 1;
+            background: #eee;
+            height: 14px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-right: 8px;
+        }
+
+        .emotion-bar-fill {
+            height: 100%;
+            background: #4caf50; 
+        }
+
+        .emotion-value {
+            width: 40px;
+            text-align: right;
+        }
+
+
+    </style>
+
+</head>
+
+
+<body>
+    <!--Expression calculator will be added here dynamically-->
+    <div id="emotions-feed"></div>
+
+    <!--Sets up the camera feed-->
+    <div id="camera">
+
+        <video id="video" autoplay muted playsinline></video>
+        
+        <!--Draws the detection results over the video feed-->
+        <canvas id="drawing"></canvas> 
+
+        <div id="face-output" 
+            aria-live="polite"> <!--Screen reader feature-->
+            Detecting a face... <!--Default output-->
+        </div>
+
+    </div>
+
+    <!--Loads the face detection API-->
+    <script src="face-api.min.js"></script>
+
+
+    <script>
+
+        const video = document.getElementById('video');
+        const faceOutput = document.getElementById('face-output');
+
+        async function loadAPI() {
+
+            //loads models from local folder
+            await faceapi.nets.tinyFaceDetector.loadFromUri('./models');
+            await faceapi.nets.faceExpressionNet.loadFromUri('./models');
+
+            //used to troubleshoot if the models were loaded in the event of an error
+            console.log('Loaded tinyFaceDetector and faceExpressionNet models');
+        }
+
+
+        async function startCamera() {
+           
+            //requests permission to use webcam
+            const webcam = await navigator.mediaDevices.getUserMedia({ video: {} });
+            
+            //attaches camera feed to the video element
+            video.srcObject = webcam;
+
+        }
+
+        //initializes the application
+        async function init() {
+
+            await loadAPI();
+            console.log('Loaded API successfully');
+
+            await startCamera();
+            console.log('Camera feed started');
+
+            //mutes the video, which encourages browsers to not block the feed
+            video.muted = true;
+
+            //when the metadata (duration, dimensions, etc.) is loaded, play the video
+            //or else log an error in the console
+            video.addEventListener('loadedmetadata', () => video.play().catch(err => console.error('Video failed to play:', err)));
+
+            //tells the console if there is a problem with the video feed
+            video.addEventListener('error', () => {
+                const err = video.error;
+                console.error('Video failed to load:', err ? `code ${err.code}: ${err.message}` : 'unknown error');
+            });
+
+            //starts looking for a face once the video is playing
+            //runs only once; otherwise, there'd be duplicate face detection going all the time
+            video.addEventListener('play', startDetection, { once: true });
+        }
+
+        
+        function displayEmotions(emotions) {
+            
+            //clears any previous emotion results to start from a blank slate
+            const container = document.getElementById('emotions-feed');
+            container.innerHTML = '';
+
+            //loops through the emotions object
+            for (const label in emotions) {
+
+                //gets the value of the emotion
+                const value = emotions[label];
+                //converts to a percentage for readability
+                const percent = Math.round(value * 100);
+
+
+                const row = document.createElement('div');
+                 //assigns a class to the row for styling purposes
+                 row.className = 'emotion-row';
+                 
+                 //builds the visualization for the row; the label, bar, etc.
+                 row.innerHTML = `
+                    <div class="emotion-label">${label}</div>
+                    <div class="emotion-bar-bg">
+                        <div class="emotion-bar-fill" style="width: ${percent}%"></div>
+                    </div>
+
+                    <div class="emotion-value">${percent}%</div>
+                 `;
+                 
+                 //adds the row to the container
+                 container.appendChild(row);
+            }
+            
+        }
+
+
+        //starts detecting a face
+        function startDetection() {
+
+            const canvas = document.getElementById('drawing');
+            const displaySize = { width: video.videoWidth || 720, height: video.videoHeight || 560 };
+
+            const detectionOptions = new faceapi.TinyFaceDetectorOptions({
+
+                //size at which image is processed
+                //default is 416; must be divisible by 32
+                //160 was chosen for performance with webcam
+                inputSize: 160,
+
+                //minimum confidence threshold for a detection to be considered valid
+                //default is 0.5 but I wanted some mistakes to go through
+                scoreThreshold: 0.3 
+
+            })
+
+            //guards against multiple detections messing with the computer performance
+            let detectionInProgress = false;
+
+            //drawing will line up with the image
+            faceapi.matchDimensions(canvas, { width: video.videoWidth, height: video.videoHeight });
+
+
+            setInterval(async () => {
+
+                //skips detection if one is already running
+                if(detectionInProgress) return;
+
+                detectionInProgress = true;
+                console.log('Starting face detection...');
+
+                try{
+
+                //look for a single face and estimate expressions
+                const detection = await faceapi
+                    .detectSingleFace(video, detectionOptions)
+                    .withFaceExpressions();
+
+                
+                //clears previous frame's drawings
+                const canvasContext = canvas.getContext('2d');
+                canvasContext.clearRect(0, 0, canvas.width, canvas.height);
+
+        
+                if(detection) {
+                    //if a face is detected, gets the expression scores
+                    const emotions = detection.expressions;
+
+                    //displays the scores in the emotions feed
+                    const[emotion, confidence] = Object.entries(emotions)
+                        //finds the highest confidence score
+                        .reduce((highest, current) => current[1] > highest[1] ? current : highest);
+                    faceOutput.textContent = `${emotion} ${Math.round(confidence * 100)}%`;
+                
+                    //resizes the detection to match the video feed
+                    const resizedDetection = faceapi.resizeResults(detection, displaySize);
+
+                    //draws the detection results on the canvas
+                    faceapi.draw.drawDetections(canvas, resizedDetection);
+
+                    //calls the function that displays the emotions on the site
+                    displayEmotions(emotions);                    
+                }
+                
+                else {
+                    faceOutput.textContent = 'No face detected';
+                }
+                }
+
+                //if there's an error, log it
+                catch(error) {
+                    console.error('Face detection failed:', error);
+                    faceOutput.textContent = 'Detection error';
+                }
+
+                //at the end of every detection, clears the boolean for the next run
+                finally {
+                    detectionInProgress = false;
+                }
+            }, 300); //runs every 300 milliseconds
+
+
+        }
+
+        init().catch((error) => {
+            console.error('Initialization failed:', error);
+            faceOutput.textContent = 'Unable to start camera';
+        });
+
+    </script>
+
+</body>
+</html>
