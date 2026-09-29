@@ -6,90 +6,190 @@
     <title>AI Face Recognition Demo</title>
 
     <style>
-        #camera {
-            position: relative;
-            width: 720px;
-            height: 560px;
+        :root {
+            color-scheme: light;
+            font-family: "Segoe UI", sans-serif;
+            color: #17211f;
+            background: #f2f5f1;
+            font-synthesis: none;
+            text-rendering: optimizeLegibility;
+            --muted: #5b6964;
+            --accent: #18856b;
+            --track: #e4ebe7;
         }
 
-        #video,
-        #drawing {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 720px;
-            height: 560px;
+        * {
+            box-sizing: border-box;
         }
 
-        #face-output {
-            position: absolute;
-            left: 16px;
-            bottom: 16px;
-            padding: 8px 12px;
-            color: #fff;
-            background: rgba(0, 0, 0, 0.7);
-            font: 600 18px sans-serif; 
+        body {
+            min-width: 320px;
+            min-height: 100vh;
+            margin: 0;
+            padding: 40px clamp(20px, 5vw, 88px) 56px;
+        }
+
+        #title {
+            width: min(100%, 1600px);
+            margin: 0 auto 36px;
+            font-size: 2rem;
+            font-weight: 650;
+            line-height: 1.15;
+        }
+
+        .experience {
+            display: grid;
+            grid-template-columns: minmax(300px, 0.8fr) minmax(0, 1.4fr);
+            align-items: center;
+            gap: clamp(36px, 6vw, 104px);
+            width: min(100%, 1600px);
+            margin: 0 auto;
+        }
+
+        .insights {
+            min-width: 0;
+        }
+
+        #prompt {
+            margin: 0 0 28px;
+            font-size: clamp(1.75rem, 2.5vw, 2.75rem);
+            font-weight: 600;
+            line-height: 1.15;
         }
 
         #emotions-feed {
-            width: 300px;
-            font-family: monospace; 
+            display: grid;
+            gap: 14px;
+            width: 100%;
+            max-width: 560px;
         }
 
         .emotion-row {
             display: flex;
             align-items: center;
-            margin-bottom: 6px;
+            gap: 14px;
+            min-width: 0;
+            color: var(--muted);
+            font-size: 1rem;
         }
 
         .emotion-label {
-            width: 90px;
+            flex: 0 0 112px;
             text-transform: capitalize;
         }
 
         .emotion-bar-bg {
             flex: 1;
-            background: #eee;
-            height: 14px;
-            border-radius: 4px;
+            height: 12px;
             overflow: hidden;
-            margin-right: 8px;
+            border-radius: 999px;
+            background: var(--track);
         }
 
         .emotion-bar-fill {
             height: 100%;
-            background: #4caf50; 
+            border-radius: inherit;
+            background: var(--accent);
         }
 
         .emotion-value {
-            width: 40px;
+            flex: 0 0 44px;
+            color: #17211f;
+            font-variant-numeric: tabular-nums;
             text-align: right;
         }
 
+        #camera {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            overflow: hidden;
+            border-radius: 8px;
+            background: #18211f;
+            box-shadow: 0 18px 54px rgba(27, 48, 41, 0.14);
+        }
 
+        #video,
+        #drawing {
+            position: absolute;
+            inset: 0;
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        #video {
+            object-fit: cover;
+        }
+
+        #drawing {
+            pointer-events: none;
+        }
+
+        #face-output {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            padding: 10px 14px;
+            border-radius: 4px;
+            color: #fff;
+            background: rgba(0, 0, 0, 0.72);
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        @media (max-width: 760px) {
+            body {
+                padding: 28px 20px 40px;
+            }
+
+            #title {
+                margin-bottom: 28px;
+                font-size: 1.75rem;
+            }
+
+            .experience {
+                grid-template-columns: minmax(0, 1fr);
+                gap: 32px;
+            }
+
+            #prompt {
+                margin-bottom: 22px;
+                font-size: 1.75rem;
+            }
+
+        }
+
+        @media (prefers-reduced-motion: no-preference) {
+            .experience {
+                animation: appear 500ms ease-out both;
+            }
+
+            @keyframes appear {
+                from { opacity: 0; transform: translateY(12px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        }
     </style>
 
 </head>
 
 
 <body>
-    <!--Expression calculator will be added here dynamically-->
-    <div id="emotions-feed"></div>
+    <h1 id="title">Catchy Title Here</h1>
 
-    <!--Sets up the camera feed-->
-    <div id="camera">
+    <main class="experience">
+        <section class="insights" aria-labelledby="prompt">
+            <h2 id="prompt">This AI thinks you are...</h2>
+            <div id="emotions-feed" aria-live="polite"></div>
+        </section>
 
-        <video id="video" autoplay muted playsinline></video>
-        
-        <!--Draws the detection results over the video feed-->
-        <canvas id="drawing"></canvas> 
-
-        <div id="face-output" 
-            aria-live="polite"> <!--Screen reader feature-->
-            Detecting a face... <!--Default output-->
-        </div>
-
-    </div>
+        <section id="camera" aria-label="Live camera feed">
+            <video id="video" autoplay muted playsinline></video>
+            <canvas id="drawing" aria-hidden="true"></canvas>
+            <div id="face-output" aria-live="polite">Detecting a face...</div>
+        </section>
+    </main>
 
     <!--Loads the face detection API-->
     <script src="face-api.min.js"></script>
@@ -157,7 +257,8 @@
 
             //loops through the emotions object
             for (const [label, value] of Object.entries(emotions)) {
-
+                //gets the value of the emotion
+                const value = emotions[label];
                 //converts to a percentage for readability
                 const percent = Math.round(value * 100);
 
