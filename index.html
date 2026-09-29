@@ -37,6 +37,14 @@
             line-height: 1.15;
         }
 
+        #subtitle {
+            width: min(100%, 1600px);
+            margin: 0 auto 36px;
+            font-size: 1.5rem;
+            font-weight: 100;
+            line-height: 1;
+        }
+        
         .experience {
             display: grid;
             grid-template-columns: minmax(300px, 0.8fr) minmax(0, 1.4fr);
@@ -176,7 +184,9 @@
 
 
 <body>
-    <h1 id="title">Catchy Title Here</h1>
+<h1 id="title">Make Widget the Robot Wave!</h1>
+<h2 id="subtitle">This AI will detect your face and emotions in real time.</h2>
+<h2 id="subtitle">Smile for 5 seconds, and get a wave!</h2>
 
     <main class="experience">
         <section class="insights" aria-labelledby="prompt">
@@ -377,6 +387,7 @@
         });
 
     </script>
+    <script src="happy-meter.js"></script>
 
 </body>
 </html>
