@@ -156,10 +156,8 @@
             container.innerHTML = '';
 
             //loops through the emotions object
-            for (const label in emotions) {
+            for (const [label, value] of Object.entries(emotions)) {
 
-                //gets the value of the emotion
-                const value = emotions[label];
                 //converts to a percentage for readability
                 const percent = Math.round(value * 100);
 
