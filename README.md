@@ -1,7 +1,8 @@
 To-do for Lily:
-  1. [in progress] Add emoji waterfall when emotions are held for a long time.
-  2. [in progress] Add a "how it works"/behind the scenes at the bottom of the page.
+  1. [finished] Add emoji waterfall when emotions are held for a long time.
+  2. [finished] Add a "how it works"/behind the scenes at the bottom of the page.
       Probably static-ish graphic, since I also want to have the code itself open.
+      update: kept this absurdly simple; I'd rather spend time on my pedagogy.
   3. Make it look better... coming up with better UI was never my strong suit.
 
 Izzy & Lily:
