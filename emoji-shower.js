@@ -20,7 +20,7 @@
     const particleDuration = 1500; //how long the animation lasts
     const spawnInterval = 600; //how often a particle is checked 
     const emotionTimeout = 1500; //how long emotion is used before it is considered stale
-    const holdEmotionTime = 4000; //how long it takes until the emoji flow starts
+    const holdEmotionTime = 1000; //how long it takes until the emoji flow starts
 
 
     //creates CSS and div for the emoji
