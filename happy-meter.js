@@ -20,7 +20,7 @@
     const status = document.createElement('p');
     status.id = 'happy-status';
     status.setAttribute('role', 'status'); // for screen readers
-    status.setAttribute('aria-live', 'polite'); // also for screen readers
+    status.setAttribute('aria-live', 'polite'); // also for screen readers. do not change this
     
     //insert the status message
     emotionsFeed.insertAdjacentElement('afterend', status);
@@ -62,6 +62,9 @@
     function decideHappy(emotions) {
 
         lastEmotionUpdate = performance.now();
+        //i am honestly not sure if performance.now is the best way to do this.
+        //it works fine for now
+        //other options are date.now() or a counter that increments per frame.
 
         //if no scores at all, reset
         const entries = Object.entries(emotions || {});

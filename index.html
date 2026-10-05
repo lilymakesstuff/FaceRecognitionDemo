@@ -3,14 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Face Recognition Demo</title>
+
+    <!-- Link to Google fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Signika+Negative:wght@300..700&display=swap" rel="stylesheet">
+
+
+    <title>AI/Coding Lab Demo</title>
 
     <style>
         :root {
             color-scheme: light;
-            font-family: "Segoe UI", sans-serif;
+            font-family: "Signika Negative", sans-serif;
             color: #17211f;
-            background: #f2f5f1;
+            background: #f4f3ec;
             font-synthesis: none;
             text-rendering: optimizeLegibility;
             --muted: #5b6964;
@@ -26,7 +33,7 @@
             min-width: 320px;
             min-height: 100vh;
             margin: 0;
-            padding: 40px clamp(20px, 5vw, 88px) 56px;
+             padding: 40px clamp(20px, 5vw, 88px) 56px; /*variable padding but not too much */
         }
 
         #title {
@@ -40,9 +47,9 @@
         #subtitle {
             width: min(100%, 1600px);
             margin: 0 auto 36px;
-            font-size: 1.5rem;
+            font-size: 1rem;
             font-weight: 100;
-            line-height: 1;
+            line-height: 0.5;
         }
         
         .experience {
@@ -184,8 +191,8 @@
 
 
 <body>
-<h1 id="title">Make Widget the Robot Wave!</h1>
-<h2 id="subtitle">This AI will detect your face and emotions in real time.</h2>
+<h1 id="title">Make Widget the Robot Wave! 🤖</h1>
+<h2 id="subtitle">This AI will detect your face and emotions in real time. (Is it getting it right?)</h2>
 <h2 id="subtitle">Smile for 5 seconds, and get a wave!</h2>
 
     <main class="experience">
@@ -199,6 +206,7 @@
             <canvas id="drawing" aria-hidden="true"></canvas>
             <div id="face-output" aria-live="polite">Detecting a face...</div>
         </section>
+
     </main>
 
     <!--Loads the face detection API-->
@@ -303,12 +311,13 @@
             const detectionOptions = new faceapi.TinyFaceDetectorOptions({
 
                 //size at which image is processed
-                //default is 416; must be divisible by 32
+                //default is 416; must be divisible by 32 (says the API)
                 //160 was chosen for performance with webcam
                 inputSize: 160,
 
                 //minimum confidence threshold for a detection to be considered valid
                 //default is 0.5 but I wanted some mistakes to go through
+                //and for nobody to have to wait for the wave
                 scoreThreshold: 0.2 
 
             })
