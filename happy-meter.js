@@ -13,7 +13,7 @@
 
     //adjust these if you want to change the time it takes to trigger the wave command
     const holdDuration = 2000; // 2 seconds
-    const countdownDuration = 5000; // 5 seconds
+    const countdownDuration = 3000; // 3 seconds
     const emotionTimeout = 1500; //1.5 seconds
 
     //adds a status message below the emotions feed
