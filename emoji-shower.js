@@ -17,15 +17,23 @@
     }
 
 
-    //adjust these if you want to change the time it takes to trigger emojis
-    const holdDuration = 4000; //4 seconds
+    const particleDuration = 1500; //how long the animation lasts
+    const spawnInterval = 600; //how often a particle is checked 
+    const emotionTimeout = 1500; //how long emotion is used before it is considered stale
+    const holdEmotionTime = 4000; //how long it takes until the emoji flow starts
 
+
+    //creates CSS and div for the emoji
     const emoji = document.createElement('div');
     emoji.id = 'emoji';
-    emoji.style.position = 'absolute';
-    emoji.style.fontSize = '5rem';
-    emoji.style.pointerEvents = 'none';
 
+    //if the camera is static, set the camera to relative
+    //i keep messing up index so this is what has to happen. lol
+    if (getComputedStyle(video.parentElement).position === 'static') {
+        video.parentElement.style.position = 'relative';
+    }
+
+    //place the emoji div after the video element in the DOM
     video.insertAdjacentElement('afterend', emoji);
 
 
@@ -33,47 +41,85 @@
     const emojiStyles = document.createElement('style');
     emojiStyles.textContent = `
         #emoji {
-            min-height: 1.5em;
-            margin: 20px 0 0;
-            font-size: 3rem;
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            overflow: hidden;
+            pointer-events: none;
         }
 
-        #emoji:empty {
-            visibility: hidden;
+        #emoji span {
+            position: absolute;
+            right: var(--particle-right);
+            bottom: 10px;
+            font-size: 4rem;
+            line-height: 1;
+            will-change: transform, opacity;
         }
     `;
     document.head.appendChild(emojiStyles); //put it in index.html head
 
     let topEmotion = null;
-    let commandSent = false;
+    let topEmotionSince = null;
     let lastEmotionUpdate = null;
 
-
-    function resetProgress() {
-        topEmotion = null;
-        commandSent = false;
-        emoji.textContent = '';
-    }
-
-    function startEmojiTimer() {
-
-    }
-
-
+    //processes each emotion update and returns the "top" emotion
     function decideTopEmotion(emotions) {
+        const now = performance.now();
+        if (lastEmotionUpdate !== null && now - lastEmotionUpdate > emotionTimeout) {
+            topEmotion = null;
+            topEmotionSince = null;
+        }
+        lastEmotionUpdate = now;
+        const entries = Object.entries(emotions || {});
+        if (entries.length === 0) {
+            topEmotion = null;
+            topEmotionSince = null;
+            return;
+        }
 
-        lastEmotionUpdate = performance.now();
-
-        //looks through emotions, finds one with highest score
-        const entries = Object.entries(emotions);
         const [emotion] = entries.reduce((highest, current) =>
             current[1] > highest[1] ? current : highest
         );
 
-        topEmotion = emotion;
-    
+        if (emotion !== topEmotion) {
+            topEmotion = emotion;
+            topEmotionSince = now;
+        }
     }
 
+    //creates one particle
+    function particleEffect(emojiCharacter) {
+
+        //if no emoji, skip this function
+        if (!emojiCharacter) return;
+
+        //creates particle element
+        const particle = document.createElement('span');
+
+        //set the content to the right emoji
+        particle.textContent = emojiCharacter;
+
+        //random horizontal spawn position between 7% and 27%
+        particle.style.setProperty('--particle-right', `${7 + Math.random() * 20}%`);
+
+        //add particle to overlay
+        emoji.appendChild(particle);
+
+        //animate the particle using the Web Animations API
+        const animation = particle.animate(
+            [
+                { transform: 'translateY(0)', opacity: 1 },
+                { transform: 'translateY(-60px)', opacity: 1, offset: 0.2 },
+                { transform: 'translateY(-180px)', opacity: 0 }
+            ],
+            { duration: particleDuration, easing: 'ease-out' } //ease-out makes the particle slow down as it rises
+        );
+        animation.onfinish = () => particle.remove();
+    }
+
+
+    //returns which emoji corresponds to the given emotion
     window.sendEmoji = function (emotion) {
         const emojiGuide = {
             neutral: '😐',
@@ -85,15 +131,28 @@
             surprised: '😲'
         };
 
-        return emojiGuide[emotion] ?? null;
+        return emojiGuide[emotion] ?? null; //default to null if emotion is not found
     };
 
+    //calls the display function from index
     window.displayEmotions = function (emotions) {
         displayEmotions.call(this, emotions);
         decideTopEmotion(emotions);
-        emoji.textContent = window.sendEmoji(topEmotion) || '';
     };
 
+    //Spawn particles only after the same emotion has persisted through the hold period.
+    window.setInterval(() => {
+        const now = performance.now();
+        const emotionIsFresh = lastEmotionUpdate !== null &&
+            now - lastEmotionUpdate <= emotionTimeout;
 
+        if (!emotionIsFresh) {
+            topEmotion = null;
+            topEmotionSince = null;
+        } else if (topEmotion !== null && topEmotionSince !== null &&
+            now - topEmotionSince >= holdEmotionTime) {
+            particleEffect(window.sendEmoji(topEmotion) || '');
+        }
+    }, spawnInterval);
 
 })();
