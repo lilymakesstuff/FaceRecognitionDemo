@@ -48,7 +48,7 @@
             width: min(100%, 1600px);
             margin: 0 auto 36px;
             font-size: 1rem;
-            font-weight: 100;
+            font-weight: 200;
             line-height: 0.5;
         }
         
@@ -63,6 +63,20 @@
 
         .insights {
             min-width: 0;
+        }
+
+        #how-it-works {
+            margin-bottom: 28px;
+        }
+
+        #how-it-works h2 {
+            margin: 0 0 6px;
+            font-size: 1.25rem;
+        }
+
+        #how-it-works p {
+            margin: 0;
+            color: var(--muted);
         }
 
         #prompt {
@@ -199,6 +213,10 @@
         <section class="insights" aria-labelledby="prompt">
             <h2 id="prompt">This AI thinks you are...</h2>
             <div id="emotions-feed" aria-live="polite"></div>
+            <section id="how-it-works" aria-labelledby="how-it-works-title">
+                <h2 id="how-it-works-title">How it works</h2>
+                <p>This demo uses the face-api.js library to detect faces in real time. Ask about the code and I can explain more!</p>
+            </section>
         </section>
 
         <section id="camera" aria-label="Live camera feed">
@@ -206,7 +224,6 @@
             <canvas id="drawing" aria-hidden="true"></canvas>
             <div id="face-output" aria-live="polite">Detecting a face...</div>
         </section>
-
     </main>
 
     <!--Loads the face detection API-->
