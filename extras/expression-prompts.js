@@ -17,7 +17,7 @@
     ];
     const promptDuration = 5000;
     const minimumDelay = 8000;
-    const maximumDelay = 18000;
+    const maximumDelay = 12000;
     let previousPromptIndex = -1;
 
     function showRandomPrompt() {
