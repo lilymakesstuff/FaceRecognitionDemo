@@ -65,6 +65,21 @@
             min-width: 0;
         }
 
+        .camera-column {
+            min-width: 0;
+        }
+
+        #expression-prompt {
+            display: flex;
+            align-items: center;
+            min-height: 48px;
+            margin: 0 0 12px;
+            padding: 10px 16px;
+            border-radius: 4px;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
         #how-it-works {
             margin-bottom: 28px;
         }
@@ -215,17 +230,21 @@
             <div id="emotions-feed" aria-live="polite"></div>
             <section id="how-it-works" aria-labelledby="how-it-works-title">
                 <br>
+                <br>
                 <h2 id="how-it-works-title">How it works</h2>
                 <p>This demo uses the face-api.js library to detect faces and estimate expressions in real time. Ask about the code and I can explain more!</p>
                 <br>
             </section>
         </section>
 
-        <section id="camera" aria-label="Live camera feed">
-            <video id="video" autoplay muted playsinline></video>
-            <canvas id="drawing" aria-hidden="true"></canvas>
-            <div id="face-output" aria-live="polite">Detecting a face...</div>
-        </section>
+        <div class="camera-column">
+            <p id="expression-prompt" aria-live="polite"></p>
+            <section id="camera" aria-label="Live camera feed">
+                <video id="video" autoplay muted playsinline></video>
+                <canvas id="drawing" aria-hidden="true"></canvas>
+                <div id="face-output" aria-live="polite">Detecting a face...</div>
+            </section>
+        </div>
     </main>
 
     <!--Loads the face detection API-->
@@ -416,6 +435,7 @@
     </script>
     <script src="emoji-shower.js"></script>
     <script src="mood-color-wash.js"></script>
+    <script src="expression-prompts.js"></script>
 
 </body>
 </html>
