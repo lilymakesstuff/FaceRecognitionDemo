@@ -5,16 +5,5 @@ To-do for Lily:
       update: kept this absurdly simple; I'd rather spend time on my pedagogy.
   3. Make it look better... coming up with better UI was never my strong suit.
 
-Izzy & Lily:
-  1. Work on API to send site's instructions to the robot.
-  2. What can the robot do? Dance, run away, etc.
-
-
-
-
-
-
-
 live site: https://lilymakesstuff.github.io/FaceRecognitionDemo/
-
 

@@ -1,8 +1,6 @@
 (() => {
 
-//note: a lot of this file is based on the happy-meter.js file.
-//it would be ideal to make a single .js file that controls the basic mechanism of detecting emotions 
-//for now I will keep them separate so that the python bridge is unaffected by any changes I make to the emoji stuff.
+//Keep the emotion visualization separate from the face-detection code.
 
 
     // Get references to the elements we need to update

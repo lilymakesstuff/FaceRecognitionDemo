@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Signika+Negative:wght@300..700&display=swap" rel="stylesheet">
 
 
-    <title>AI/Coding Lab Demo</title>
+    <title>Facial Recognition Demo</title>
 
     <style>
         :root {
@@ -205,19 +205,18 @@
 
 
 <body>
-<h1 id="title">Talk to Widget the Robot 🤖</h1>
-<p>This AI will detect your face and emotions in real time. (Is it getting it right?)</p>
-<p>What will Widget do when you smile?</p>
+<h1 id="title">Facial Recognition Demo</h1>
+<p>See how facial recognition detects faces and estimates expressions in real time.</p>
+<p>Are the expression estimates getting it right?</p>
 
     <main class="experience">
         <section class="insights" aria-labelledby="prompt">
-            <h2 id="prompt">This AI thinks you are...</h2>
+            <h2 id="prompt">Detected facial expressions</h2>
             <div id="emotions-feed" aria-live="polite"></div>
             <section id="how-it-works" aria-labelledby="how-it-works-title">
                 <h2 id="how-it-works-title">How it works</h2>
-                <p>This demo uses the face-api.js library to detect faces in real time. Ask about the code and I can explain more!</p>
+                <p>This demo uses the face-api.js library to detect faces and estimate expressions in real time. Ask about the code and I can explain more!</p>
                 <br>
-                <p>Interested in Widget the robot? Robotics is in the other room - ask about it!</p>
             </section>
         </section>
 
@@ -335,8 +334,7 @@
                 inputSize: 160,
 
                 //minimum confidence threshold for a detection to be considered valid
-                //default is 0.5 but I wanted some mistakes to go through
-                //and for nobody to have to wait for the wave
+                //lower than the default 0.5 to allow more detections through
                 scoreThreshold: 0.2 
 
             })
@@ -415,7 +413,6 @@
         });
 
     </script>
-    <script src="happy-meter.js"></script>
     <script src="emoji-shower.js"></script>
 
 </body>
